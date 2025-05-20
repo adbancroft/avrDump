@@ -1,8 +1,9 @@
 #pragma once
 
-#include <Arduino.h>
-#include <EEPROM.h>
 #include <assert.h>
+#include <stdint.h>
+#include <avr/eeprom.h>
+#include <avr/io.h>
 #include "utils.h"
 
 /** @brief Structure to hold a chunk of EEPROM data */
@@ -18,18 +19,15 @@ struct chunk_t {
  * @param c The chunk to populate
  * @return The populated chunk
  */
-static inline chunk_t populateChunk(EEPROMClass &eeprom, uint16_t address, chunk_t c) {
+static inline chunk_t populateChunk(uint16_t address, chunk_t c) {
   assert(c.length <= _countof(chunk_t::data));
-
-  for (uint8_t i = 0; i < c.length; i++) {
-    c.data[i] = eeprom.read(address + i);
-  }
+  eeprom_read_block ((void*)c.data, (const void*)address, c.length);
   return c;
 }
 
 /** @brief Read a chunk of data starting at the given address */
-static inline chunk_t readChunk(EEPROMClass &eeprom, uint16_t address, uint8_t length) {
-  assert(address + length <= eeprom.length());
+static inline chunk_t readChunk(uint16_t address, uint8_t length) {
+  assert(address + length <= E2END);
 
-  return populateChunk(eeprom, address, { .data = {0}, .length = length });
+  return populateChunk(address, { .data = {0}, .length = length });
 }

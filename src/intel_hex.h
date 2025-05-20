@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Arduino.h>
 #include "chunk.h"
 
 /** @brief Generate a header field for a data record (type 00) */
